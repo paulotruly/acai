@@ -15,3 +15,43 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+  MIXED
+}
+
+model EventType {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  newsEvents NewsEvent[]
+}
+
+model NewsEvent {
+  id                  Int        @id @default(autoincrement())
+  title               String?
+  date                DateTime?
+  source              String
+  url                 String     @unique
+  fullText            String     @db.Text
+  eventTypeId         Int?
+  eventType           EventType? @relation(fields: [eventTypeId], references: [id])
+  locationText        String?
+  neighborhood        String?
+  streetOrLandmark    String?
+  peopleAffected      String?    @db.Text
+  materialDamage      String?    @db.Text
+  infrastructureIssue String?    @db.Text
+  residentQuote       String?    @db.Text
+  institutionQuote    String?    @db.Text
+  sentiment           Sentiment?
+  themes              Json?
+  latitude            Float?
+  longitude           Float?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
