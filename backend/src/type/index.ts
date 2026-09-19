@@ -4,81 +4,81 @@ export interface ApiResponse<T = unknown> {
   data?: T
 }
 
-export interface User {
+export interface Usuario {
   id: number
   email: string
-  name: string | null
-  password: string
-  createdAt: Date
-  updatedAt: Date
+  nome: string | null
+  senha: string
+  criadoEm: Date
+  atualizadoEm: Date
 }
 
-export interface CreateUserInput {
+export interface CriarUsuarioInput {
   email: string
-  name?: string
-  password: string
+  nome?: string
+  senha: string
 }
 
-export type Sentiment = 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL' | 'MIXED'
+export type Sentimento = 'POSITIVO' | 'NEGATIVO' | 'NEUTRO' | 'MISTO'
 
-export interface EventType {
+export interface TipoEvento {
   id: number
-  name: string
-  createdAt: Date
-  updatedAt: Date
+  nome: string
+  criadoEm: Date
+  atualizadoEm: Date
 }
 
-export interface NewsEvent {
+export interface Noticia {
   id: number
-  title: string | null
-  date: Date | null
-  source: string
+  titulo: string | null
+  data: Date | null
+  fonte: string
   url: string
-  fullText: string
-  eventTypeId: number | null
-  locationText: string | null
-  neighborhood: string | null
-  streetOrLandmark: string | null
-  peopleAffected: string | null
-  materialDamage: string | null
-  infrastructureIssue: string | null
-  residentQuote: string | null
-  institutionQuote: string | null
-  sentiment: Sentiment | null
-  themes: unknown
+  textoCompleto: string
+  tipoEventoId: number | null
+  localizacaoTexto: string | null
+  bairro: string | null
+  ruaOuPontoDeReferencia: string | null
+  pessoasAfetadas: string | null
+  danoMaterial: string | null
+  problemaInfraestrutura: string | null
+  depoimentoMorador: string | null
+  depoimentoInstituicao: string | null
+  sentimento: Sentimento | null
+  temas: unknown
   latitude: number | null
   longitude: number | null
-  createdAt: Date
-  updatedAt: Date
+  criadoEm: Date
+  atualizadoEm: Date
 }
 
-export interface CreateNewsEventInput {
-  title?: string
-  date?: Date
-  source: string
+export interface CriarNoticiaInput {
+  titulo?: string
+  data?: Date
+  fonte: string
   url: string
-  fullText: string
-  eventTypeId?: number
-  locationText?: string
-  neighborhood?: string
-  streetOrLandmark?: string
-  peopleAffected?: string
-  materialDamage?: string
-  infrastructureIssue?: string
-  residentQuote?: string
-  institutionQuote?: string
-  sentiment?: Sentiment
-  themes?: string[]
+  textoCompleto: string
+  tipoEventoId?: number
+  localizacaoTexto?: string
+  bairro?: string
+  ruaOuPontoDeReferencia?: string
+  pessoasAfetadas?: string
+  danoMaterial?: string
+  problemaInfraestrutura?: string
+  depoimentoMorador?: string
+  depoimentoInstituicao?: string
+  sentimento?: Sentimento
+  temas?: string[]
   latitude?: number
   longitude?: number
 }
 
-export interface SearchNewsEventsInput {
-  query: string
-  count?: number
+export interface PesquisarNoticiasInput {
+  consulta: string
+  quantidade?: number
 }
 
-export interface SearchNewsEventsResult {
-  created: NewsEvent[]
-  skipped: number
+export interface PesquisarNoticiasResultado {
+  criadas: Noticia[]
+  ignoradas: number
 }

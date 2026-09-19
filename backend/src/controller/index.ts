@@ -1,59 +1,59 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
-import { eventTypeService, newsEventService, userService } from '../service/index.js'
+import { tipoEventoService, noticiaService, usuarioService } from '../service/index.js'
 import type {
   ApiResponse,
-  EventType,
-  NewsEvent,
-  SearchNewsEventsResult,
-  User,
+  TipoEvento,
+  Noticia,
+  PesquisarNoticiasResultado,
+  Usuario,
 } from '../type/index.js'
 
-const createUserSchema = z.object({
+const criarUsuarioSchema = z.object({
   email: z.string().email(),
-  name: z.string().optional(),
-  password: z.string().min(6),
+  nome: z.string().optional(),
+  senha: z.string().min(6),
 })
 
-const createNewsEventSchema = z.object({
-  title: z.string().optional(),
-  date: z.coerce.date().optional(),
-  source: z.string().min(1),
+const criarNoticiaSchema = z.object({
+  titulo: z.string().optional(),
+  data: z.coerce.date().optional(),
+  fonte: z.string().min(1),
   url: z.string().url(),
-  fullText: z.string().min(1),
-  eventTypeId: z.number().int().optional(),
-  locationText: z.string().optional(),
-  neighborhood: z.string().optional(),
-  streetOrLandmark: z.string().optional(),
-  peopleAffected: z.string().optional(),
-  materialDamage: z.string().optional(),
-  infrastructureIssue: z.string().optional(),
-  residentQuote: z.string().optional(),
-  institutionQuote: z.string().optional(),
-  sentiment: z.enum(['POSITIVE', 'NEGATIVE', 'NEUTRAL', 'MIXED']).optional(),
-  themes: z.array(z.string()).optional(),
+  textoCompleto: z.string().min(1),
+  tipoEventoId: z.number().int().optional(),
+  localizacaoTexto: z.string().optional(),
+  bairro: z.string().optional(),
+  ruaOuPontoDeReferencia: z.string().optional(),
+  pessoasAfetadas: z.string().optional(),
+  danoMaterial: z.string().optional(),
+  problemaInfraestrutura: z.string().optional(),
+  depoimentoMorador: z.string().optional(),
+  depoimentoInstituicao: z.string().optional(),
+  sentimento: z.enum(['POSITIVO', 'NEGATIVO', 'NEUTRO', 'MISTO']).optional(),
+  temas: z.array(z.string()).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 })
 
-const searchNewsEventsSchema = z.object({
-  query: z.string().min(1),
-  count: z.coerce.number().int().min(1).max(20).optional(),
+const pesquisarNoticiasSchema = z.object({
+  consulta: z.string().min(1),
+  quantidade: z.coerce.number().int().min(1).max(20).optional(),
 })
 
-export const userController = {
+export const usuarioController = {
   async list(_req: Request, res: Response) {
-    const users = await userService.list()
-    const body: ApiResponse<User[]> = {
+    const usuarios = await usuarioService.list()
+    const body: ApiResponse<Usuario[]> = {
       success: true,
       message: 'Usuários listados',
-      data: users,
+      data: usuarios,
     }
     res.json(body)
   },
 
   async create(req: Request, res: Response) {
-    const parsed = createUserSchema.safeParse(req.body)
+    const parsed = criarUsuarioSchema.safeParse(req.body)
 
     if (!parsed.success) {
       const body: ApiResponse = {
@@ -65,59 +65,59 @@ export const userController = {
       return
     }
 
-    const user = await userService.create(parsed.data)
-    const body: ApiResponse<User> = {
+    const usuario = await usuarioService.create(parsed.data)
+    const body: ApiResponse<Usuario> = {
       success: true,
       message: 'Usuário criado',
-      data: user,
+      data: usuario,
     }
     res.status(201).json(body)
   },
 }
 
-export const eventTypeController = {
+export const tipoEventoController = {
   async list(_req: Request, res: Response) {
-    const eventTypes = await eventTypeService.list()
-    const body: ApiResponse<EventType[]> = {
+    const tiposEvento = await tipoEventoService.list()
+    const body: ApiResponse<TipoEvento[]> = {
       success: true,
       message: 'Tipos de evento listados',
-      data: eventTypes,
+      data: tiposEvento,
     }
     res.json(body)
   },
 }
 
-export const newsEventController = {
+export const noticiaController = {
   async list(_req: Request, res: Response) {
-    const newsEvents = await newsEventService.list()
-    const body: ApiResponse<NewsEvent[]> = {
+    const noticias = await noticiaService.list()
+    const body: ApiResponse<Noticia[]> = {
       success: true,
       message: 'Notícias listadas',
-      data: newsEvents,
+      data: noticias,
     }
     res.json(body)
   },
 
   async getById(req: Request, res: Response) {
     const id = Number(req.params.id)
-    const newsEvent = await newsEventService.findById(id)
+    const noticia = await noticiaService.findById(id)
 
-    if (!newsEvent) {
+    if (!noticia) {
       const body: ApiResponse = { success: false, message: 'Notícia não encontrada' }
       res.status(404).json(body)
       return
     }
 
-    const body: ApiResponse<NewsEvent> = {
+    const body: ApiResponse<Noticia> = {
       success: true,
       message: 'Notícia encontrada',
-      data: newsEvent,
+      data: noticia,
     }
     res.json(body)
   },
 
   async create(req: Request, res: Response) {
-    const parsed = createNewsEventSchema.safeParse(req.body)
+    const parsed = criarNoticiaSchema.safeParse(req.body)
 
     if (!parsed.success) {
       const body: ApiResponse = {
@@ -129,17 +129,17 @@ export const newsEventController = {
       return
     }
 
-    const newsEvent = await newsEventService.create(parsed.data)
-    const body: ApiResponse<NewsEvent> = {
+    const noticia = await noticiaService.create(parsed.data)
+    const body: ApiResponse<Noticia> = {
       success: true,
       message: 'Notícia criada',
-      data: newsEvent,
+      data: noticia,
     }
     res.status(201).json(body)
   },
 
   async search(req: Request, res: Response) {
-    const parsed = searchNewsEventsSchema.safeParse(req.body)
+    const parsed = pesquisarNoticiasSchema.safeParse(req.body)
 
     if (!parsed.success) {
       const body: ApiResponse = {
@@ -151,10 +151,10 @@ export const newsEventController = {
       return
     }
 
-    const result = await newsEventService.search(parsed.data.query, parsed.data.count)
-    const body: ApiResponse<SearchNewsEventsResult> = {
+    const result = await noticiaService.search(parsed.data.consulta, parsed.data.quantidade)
+    const body: ApiResponse<PesquisarNoticiasResultado> = {
       success: true,
-      message: `${result.created.length} notícia(s) criada(s), ${result.skipped} já existiam`,
+      message: `${result.criadas.length} notícia(s) criada(s), ${result.ignoradas} já existiam`,
       data: result,
     }
     res.status(201).json(body)

@@ -5,7 +5,7 @@ import { env } from './env.js'
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
 function createPrismaClient() {
-  const adapter = new PrismaMariaDb(env.DATABASE_URL)
+  const adapter = new PrismaMariaDb(env.URL_BANCO_DE_DADOS)
   return new PrismaClient({ adapter })
 }
 

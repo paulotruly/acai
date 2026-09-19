@@ -1,79 +1,79 @@
 import { prisma } from '../config/database.js'
-import { generateMockNewsEvents } from './mockNewsExtraction.js'
+import { pesquisarNoticiasComGemini } from './extracaoNoticias.js'
 import type {
-  CreateNewsEventInput,
-  CreateUserInput,
-  EventType,
-  NewsEvent,
-  SearchNewsEventsResult,
-  User,
+  CriarNoticiaInput,
+  CriarUsuarioInput,
+  Noticia,
+  PesquisarNoticiasResultado,
+  TipoEvento,
+  Usuario,
 } from '../type/index.js'
 
-export const userService = {
-  async list(): Promise<User[]> {
-    return prisma.user.findMany()
+export const usuarioService = {
+  async list(): Promise<Usuario[]> {
+    return prisma.usuario.findMany()
   },
 
-  async create(input: CreateUserInput): Promise<User> {
-    return prisma.user.create({
+  async create(input: CriarUsuarioInput): Promise<Usuario> {
+    return prisma.usuario.create({
       data: {
         email: input.email,
-        name: input.name,
-        password: input.password,
+        nome: input.nome,
+        senha: input.senha,
       },
     })
   },
 
-  async findById(id: number): Promise<User | null> {
-    return prisma.user.findUnique({ where: { id } })
+  async findById(id: number): Promise<Usuario | null> {
+    return prisma.usuario.findUnique({ where: { id } })
   },
 }
 
-export const eventTypeService = {
-  async list(): Promise<EventType[]> {
-    return prisma.eventType.findMany({ orderBy: { name: 'asc' } })
+export const tipoEventoService = {
+  async list(): Promise<TipoEvento[]> {
+    return prisma.tipoEvento.findMany({ orderBy: { nome: 'asc' } })
   },
 }
 
-export const newsEventService = {
-  async list(): Promise<NewsEvent[]> {
-    return prisma.newsEvent.findMany({ orderBy: { createdAt: 'desc' } })
+export const noticiaService = {
+  async list(): Promise<Noticia[]> {
+    return prisma.noticia.findMany({ orderBy: { criadoEm: 'desc' } })
   },
 
-  async findById(id: number): Promise<NewsEvent | null> {
-    return prisma.newsEvent.findUnique({ where: { id } })
+  async findById(id: number): Promise<Noticia | null> {
+    return prisma.noticia.findUnique({ where: { id } })
   },
 
-  async create(input: CreateNewsEventInput): Promise<NewsEvent> {
-    return prisma.newsEvent.create({ data: input })
+  async create(input: CriarNoticiaInput): Promise<Noticia> {
+    return prisma.noticia.create({ data: input })
   },
 
-  async search(query: string, count = 3): Promise<SearchNewsEventsResult> {
-    const mockItems = generateMockNewsEvents(query, count)
+  async search(consulta: string, quantidade = 3): Promise<PesquisarNoticiasResultado> {
+    const items = await pesquisarNoticiasComGemini(consulta, quantidade)
 
-    const existing = await prisma.newsEvent.findMany({
-      where: { url: { in: mockItems.map((item) => item.url) } },
+    const existing = await prisma.noticia.findMany({
+      where: { url: { in: items.map((item) => item.url) } },
       select: { url: true },
     })
     const existingUrls = new Set(existing.map((item) => item.url))
 
-    const created: NewsEvent[] = []
-    for (const item of mockItems) {
+    const criadas: Noticia[] = []
+    for (const item of items) {
       if (existingUrls.has(item.url)) continue
 
-      const eventType = await prisma.eventType.upsert({
-        where: { name: item.eventTypeName },
+      const tipoEvento = await prisma.tipoEvento.upsert({
+        where: { nome: item.nomeTipoEvento },
         update: {},
-        create: { name: item.eventTypeName },
+        create: { nome: item.nomeTipoEvento },
       })
 
-      const { eventTypeName: _eventTypeName, ...data } = item
-      const newsEvent = await prisma.newsEvent.create({
-        data: { ...data, eventTypeId: eventType.id },
+      const { nomeTipoEvento: _nomeTipoEvento, ...data } = item
+      const noticia = await prisma.noticia.create({
+        data: { ...data, tipoEventoId: tipoEvento.id },
       })
-      created.push(newsEvent)
+      criadas.push(noticia)
     }
 
-    return { created, skipped: mockItems.length - created.length }
+    return { criadas, ignoradas: items.length - criadas.length }
   },
 }

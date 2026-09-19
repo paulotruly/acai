@@ -7,51 +7,51 @@ datasource db {
   provider = "mysql"
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  nome         String?
+  senha        String
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 }
 
-enum Sentiment {
-  POSITIVE
-  NEGATIVE
-  NEUTRAL
-  MIXED
+enum Sentimento {
+  POSITIVO
+  NEGATIVO
+  NEUTRO
+  MISTO
 }
 
-model EventType {
-  id         Int         @id @default(autoincrement())
-  name       String      @unique
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  newsEvents NewsEvent[]
+model TipoEvento {
+  id           Int       @id @default(autoincrement())
+  nome         String    @unique
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+  noticias     Noticia[]
 }
 
-model NewsEvent {
-  id                  Int        @id @default(autoincrement())
-  title               String?
-  date                DateTime?
-  source              String
-  url                 String     @unique
-  fullText            String     @db.Text
-  eventTypeId         Int?
-  eventType           EventType? @relation(fields: [eventTypeId], references: [id])
-  locationText        String?
-  neighborhood        String?
-  streetOrLandmark    String?
-  peopleAffected      String?    @db.Text
-  materialDamage      String?    @db.Text
-  infrastructureIssue String?    @db.Text
-  residentQuote       String?    @db.Text
-  institutionQuote    String?    @db.Text
-  sentiment           Sentiment?
-  themes              Json?
-  latitude            Float?
-  longitude           Float?
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+model Noticia {
+  id                     Int         @id @default(autoincrement())
+  titulo                 String?
+  data                   DateTime?
+  fonte                  String
+  url                    String      @unique
+  textoCompleto          String      @db.Text
+  tipoEventoId           Int?
+  tipoEvento             TipoEvento? @relation(fields: [tipoEventoId], references: [id])
+  localizacaoTexto       String?
+  bairro                 String?
+  ruaOuPontoDeReferencia String?
+  pessoasAfetadas        String?     @db.Text
+  danoMaterial           String?     @db.Text
+  problemaInfraestrutura String?     @db.Text
+  depoimentoMorador      String?     @db.Text
+  depoimentoInstituicao  String?     @db.Text
+  sentimento             Sentimento?
+  temas                  Json?
+  latitude               Float?
+  longitude              Float?
+  criadoEm               DateTime    @default(now())
+  atualizadoEm           DateTime    @updatedAt
 }

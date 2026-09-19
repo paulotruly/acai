@@ -1,16 +1,16 @@
 import { Router } from 'express'
-import { eventTypeController, newsEventController, userController } from '../controller/index.js'
+import { tipoEventoController, noticiaController, usuarioController } from '../controller/index.js'
 
 const router = Router()
 
-router.get('/users', userController.list)
-router.post('/users', userController.create)
+router.get('/usuarios', usuarioController.list)
+router.post('/usuarios', usuarioController.create)
 
-router.get('/event-types', eventTypeController.list)
+router.get('/tipos-evento', tipoEventoController.list)
 
-router.get('/news-events', newsEventController.list)
-router.get('/news-events/:id', newsEventController.getById)
-router.post('/news-events', newsEventController.create)
-router.post('/news-events/search', newsEventController.search)
+router.get('/noticias', noticiaController.list)
+router.get('/noticias/:id', noticiaController.getById)
+router.post('/noticias', noticiaController.create)
+router.post('/noticias/pesquisar', noticiaController.search)
 
 export default router
