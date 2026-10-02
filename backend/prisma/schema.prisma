@@ -33,16 +33,16 @@ model TipoEvento {
 
 model Noticia {
   id                     Int         @id @default(autoincrement())
-  titulo                 String?
+  titulo                 String?     @db.VarChar(500)
   data                   DateTime?
   fonte                  String
-  url                    String      @unique
+  url                    String      @unique @db.VarChar(700)
   textoCompleto          String      @db.Text
   tipoEventoId           Int?
   tipoEvento             TipoEvento? @relation(fields: [tipoEventoId], references: [id])
-  localizacaoTexto       String?
-  bairro                 String?
-  ruaOuPontoDeReferencia String?
+  localizacaoTexto       String?     @db.Text
+  bairro                 String?     @db.Text
+  ruaOuPontoDeReferencia String?     @db.Text
   pessoasAfetadas        String?     @db.Text
   danoMaterial           String?     @db.Text
   problemaInfraestrutura String?     @db.Text

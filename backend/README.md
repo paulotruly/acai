@@ -2,12 +2,22 @@
 
 API responsável por coletar e estruturar fatos extraídos de notícias/posts sobre
 eventos de desastre (enchente, alagamento, deslizamento, falta d'água etc.). A
-etapa de pesquisa/extração usa a **API do Gemini (Google)**: o endpoint de
-busca envia o termo pesquisado para o Gemini, que usa a busca do Google para
-encontrar notícias/posts reais e retornar os fatos já estruturados, que são
-então salvos no banco. A API do Gemini tem uma camada gratuita (limitada por
-taxa de requisições) nos modelos da família Flash, sem necessidade de cartão
-de crédito — ver [ai.google.dev/gemini-api/docs/pricing](https://ai.google.dev/gemini-api/docs/pricing).
+etapa de pesquisa/extração usa a **API do Gemini (Google)** em duas fases:
+
+1. **Busca** — o termo é enviado ao Gemini com a ferramenta de busca do Google
+   (1 chamada). As URLs usadas vêm do `groundingMetadata` da resposta (as
+   páginas que a busca realmente consultou), nunca do texto gerado pelo modelo,
+   que pode inventar links.
+2. **Extração** — para cada URL ainda não salva, a página real é baixada e seu
+   texto é enviado ao Gemini, sem busca (1 chamada por página), que extrai os
+   fatos em JSON estruturado e marca se a página é relevante (previsão do tempo,
+   capas de portal etc. são descartadas). `url`, `fonte`, `titulo`, `data` e
+   `textoCompleto` vêm da própria página.
+
+A API do Gemini tem uma camada gratuita (limitada por taxa de requisições) nos
+modelos Flash — ver [ai.google.dev/gemini-api/docs/pricing](https://ai.google.dev/gemini-api/docs/pricing).
+**Use `gemini-2.5-flash`**: no plano gratuito, os modelos mais novos
+(`gemini-flash-latest`) retornam 429 quando a busca do Google é usada.
 
 ## Stack
 
@@ -36,7 +46,7 @@ backend/
 │   ├── controller/index.ts# validação (zod) + resposta HTTP
 │   ├── service/
 │   │   ├── index.ts               # regras de negócio + acesso ao Prisma
-│   │   └── extracaoNoticias.ts    # chamada ao Gemini (busca no Google + extração)
+│   │   └── extracaoNoticias.ts    # Gemini: busca no Google + extração da página real
 │   ├── type/index.ts      # tipos compartilhados (DTOs)
 │   └── generated/prisma/  # client do Prisma gerado (não versionado)
 └── .env.example
@@ -99,7 +109,7 @@ Edite `.env`:
 URL_BANCO_DE_DADOS="mysql://usuario:senha@localhost:3306/pesquisa_cientifica"
 PORTA=3000
 CHAVE_API_GEMINI="AIza..."
-MODELO_GEMINI="gemini-flash-latest"
+MODELO_GEMINI="gemini-2.5-flash"
 ```
 
 Depois:
@@ -133,7 +143,7 @@ Prefixo base: `/api` (fora do prefixo só existe `GET /health`).
 | GET    | `/api/noticias`          | lista as notícias/eventos salvos                                           |
 | GET    | `/api/noticias/:id`      | busca uma notícia/evento por id                                            |
 | POST   | `/api/noticias`          | cria uma notícia/evento manualmente (mesmos campos da tabela)              |
-| POST   | `/api/noticias/pesquisar`| **pesquisa via Gemini**: recebe `{ consulta, quantidade? }`, o Gemini busca notícias reais no Google, extrai os fatos e salva as que ainda não existem (por `url`), pulando duplicatas |
+| POST   | `/api/noticias/pesquisar`| **pesquisa via Gemini**: recebe `{ consulta, quantidade? }`, o Gemini busca no Google, as páginas reais encontradas são baixadas e os fatos extraídos; salva até `quantidade` notícias novas (por `url`), pulando duplicatas |
 
 ### Exemplo — pesquisa via Gemini
 

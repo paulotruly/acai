@@ -1,5 +1,5 @@
 import { prisma } from '../config/database.js'
-import { pesquisarNoticiasComGemini } from './extracaoNoticias.js'
+import { buscarFontesComGemini, extrairNoticiaDaPagina } from './extracaoNoticias.js'
 import type {
   CriarNoticiaInput,
   CriarUsuarioInput,
@@ -49,31 +49,39 @@ export const noticiaService = {
   },
 
   async search(consulta: string, quantidade = 3): Promise<PesquisarNoticiasResultado> {
-    const items = await pesquisarNoticiasComGemini(consulta, quantidade)
+    const fontes = await buscarFontesComGemini(consulta)
 
     const existing = await prisma.noticia.findMany({
-      where: { url: { in: items.map((item) => item.url) } },
+      where: { url: { in: fontes.map((fonte) => fonte.url) } },
       select: { url: true },
     })
     const existingUrls = new Set(existing.map((item) => item.url))
+    const novas = fontes.filter((fonte) => !existingUrls.has(fonte.url))
 
     const criadas: Noticia[] = []
-    for (const item of items) {
-      if (existingUrls.has(item.url)) continue
+    for (const fonte of novas) {
+      if (criadas.length >= quantidade) break
 
-      const tipoEvento = await prisma.tipoEvento.upsert({
-        where: { nome: item.nomeTipoEvento },
-        update: {},
-        create: { nome: item.nomeTipoEvento },
-      })
+      try {
+        const item = await extrairNoticiaDaPagina(fonte)
+        if (!item) continue
 
-      const { nomeTipoEvento: _nomeTipoEvento, ...data } = item
-      const noticia = await prisma.noticia.create({
-        data: { ...data, tipoEventoId: tipoEvento.id },
-      })
-      criadas.push(noticia)
+        const tipoEvento = await prisma.tipoEvento.upsert({
+          where: { nome: item.nomeTipoEvento },
+          update: {},
+          create: { nome: item.nomeTipoEvento },
+        })
+
+        const { nomeTipoEvento: _nomeTipoEvento, ...data } = item
+        const noticia = await prisma.noticia.create({
+          data: { ...data, tipoEventoId: tipoEvento.id },
+        })
+        criadas.push(noticia)
+      } catch (erro) {
+        console.warn(`Falha ao processar ${fonte.url}:`, erro)
+      }
     }
 
-    return { criadas, ignoradas: items.length - criadas.length }
+    return { criadas, ignoradas: existingUrls.size }
   },
 }
