@@ -107,7 +107,7 @@ Edite `.env`:
 
 ```
 URL_BANCO_DE_DADOS="mysql://usuario:senha@localhost:3306/pesquisa_cientifica"
-PORTA=3000
+PORTA=3001
 CHAVE_API_GEMINI="AIza..."
 MODELO_GEMINI="gemini-2.5-flash"
 ```
@@ -118,7 +118,7 @@ Depois:
 npm run prisma:generate   # gera o Prisma Client
 npm run prisma:migrate    # cria o banco/tabelas (prisma migrate dev)
 npm run db:seed           # popula o usuário admin e os TipoEvento iniciais
-npm run dev                # sobe a API em http://localhost:3000 (hot reload)
+npm run dev                # sobe a API em http://localhost:3001 (hot reload)
 ```
 
 Outros scripts úteis:
@@ -148,7 +148,7 @@ Prefixo base: `/api` (fora do prefixo só existe `GET /health`).
 ### Exemplo — pesquisa via Gemini
 
 ```bash
-curl -X POST http://localhost:3000/api/noticias/pesquisar \
+curl -X POST http://localhost:3001/api/noticias/pesquisar \
   -H "Content-Type: application/json" \
   -d '{"consulta": "enchente recife", "quantidade": 3}'
 ```

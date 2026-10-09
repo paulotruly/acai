@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_URL_API ?? 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_URL_API ?? 'http://localhost:3001/api',
 })
 
 interface ApiResponse<T> {

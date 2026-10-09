@@ -61,7 +61,7 @@ function DashboardPage() {
         setNoticias(noticias)
         setTiposEvento(tipos)
       })
-      .catch(() => setErro('Não foi possível carregar os dados. O backend está rodando em localhost:3000?'))
+      .catch(() => setErro('Não foi possível carregar os dados. O backend está rodando em localhost:3001?'))
       .finally(() => setCarregando(false))
   }, [])
 
