@@ -29,29 +29,223 @@ model TipoEvento {
   criadoEm     DateTime  @default(now())
   atualizadoEm DateTime  @updatedAt
   noticias     Noticia[]
+  atendimentos AtendimentoDefesaCivil[]
 }
 
 model Noticia {
-  id                     Int         @id @default(autoincrement())
-  titulo                 String?     @db.VarChar(500)
-  data                   DateTime?
+  id                     Int             @id @default(autoincrement())
+  titulo                 String?         @db.VarChar(500)
+  dataPublicacao         DateTime?       @db.Date
+  dataEvento             DateTime?       @db.Date
   fonte                  String
-  url                    String      @unique @db.VarChar(700)
-  textoCompleto          String      @db.Text
+  url                    String          @unique @db.VarChar(700)
+  textoCompleto          String          @db.Text
+  origem                 OrigemNoticia   @default(COLETA)
+  candidatoId            Int?            @unique
+  candidato              Candidato?      @relation(fields: [candidatoId], references: [id])
+  duplicadaDeId          Int?
+  duplicadaDe            Noticia?        @relation("NoticiaDuplicada", fields: [duplicadaDeId], references: [id], onDelete: SetNull)
+  duplicatas             Noticia[]       @relation("NoticiaDuplicada")
+  hashTexto              String?         @db.Char(64)
   tipoEventoId           Int?
-  tipoEvento             TipoEvento? @relation(fields: [tipoEventoId], references: [id])
-  localizacaoTexto       String?     @db.Text
-  bairro                 String?     @db.Text
-  ruaOuPontoDeReferencia String?     @db.Text
-  pessoasAfetadas        String?     @db.Text
-  danoMaterial           String?     @db.Text
-  problemaInfraestrutura String?     @db.Text
-  depoimentoMorador      String?     @db.Text
-  depoimentoInstituicao  String?     @db.Text
+  tipoEvento             TipoEvento?     @relation(fields: [tipoEventoId], references: [id])
+  localizacaoTexto       String?         @db.Text
+  bairroTexto            String?         @db.Text
+  ruaOuPontoDeReferencia String?         @db.Text
+  pessoasAfetadas        String?         @db.Text
+  danoMaterial           String?         @db.Text
+  problemaInfraestrutura String?         @db.Text
+  depoimentoMorador      String?         @db.Text
+  depoimentoInstituicao  String?         @db.Text
   sentimento             Sentimento?
   temas                  Json?
   latitude               Float?
   longitude              Float?
-  criadoEm               DateTime    @default(now())
-  atualizadoEm           DateTime    @updatedAt
+  locais                 NoticiaLocal[]
+  criadoEm               DateTime        @default(now())
+  atualizadoEm           DateTime        @updatedAt
+
+  @@index([dataPublicacao])
+  @@index([tipoEventoId, dataPublicacao])
+  @@index([hashTexto])
+}
+
+enum OrigemNoticia {
+  LEGADO
+  COLETA
+}
+
+model Municipio {
+  id          Int            @id @default(autoincrement())
+  codigoIbge  Int            @unique
+  nome        String         @unique
+  bairros     Bairro[]
+  noticias    NoticiaLocal[]
+}
+
+model Bairro {
+  id              Int                      @id @default(autoincrement())
+  municipioId     Int
+  municipio       Municipio                @relation(fields: [municipioId], references: [id])
+  nome            String
+  nomeNormalizado String
+  noticias        NoticiaLocal[]
+  atendimentos    AtendimentoDefesaCivil[]
+
+  @@unique([municipioId, nomeNormalizado])
+}
+
+model NoticiaLocal {
+  id            Int       @id @default(autoincrement())
+  noticiaId     Int
+  noticia       Noticia   @relation(fields: [noticiaId], references: [id], onDelete: Cascade)
+  municipioId   Int
+  municipio     Municipio @relation(fields: [municipioId], references: [id])
+  bairroId      Int?
+  bairro        Bairro?   @relation(fields: [bairroId], references: [id])
+  textoOriginal String?   @db.VarChar(255)
+
+  @@index([noticiaId])
+  @@index([municipioId])
+  @@index([bairroId])
+}
+
+enum EstadoExecucao {
+  PENDENTE
+  CONCLUIDA
+  SATURADA
+  FALHOU
+}
+
+enum EstadoCandidato {
+  DESCOBERTO
+  DESCARTADO_TITULO
+  URL_RESOLVIDA
+  FALHA_DECODIFICACAO
+  DUPLICADO_URL
+  BLOQUEADO
+  SEM_TEXTO
+  FORA_TERRITORIO
+  AGUARDANDO_LLM
+  EXTRAIDO
+  IRRELEVANTE
+  FALHA_LLM
+}
+
+model ArtefatoBruto {
+  id          Int      @id @default(autoincrement())
+  tipo        String
+  urlOrigem   String   @db.VarChar(1000)
+  caminho     String   @db.VarChar(500)
+  sha256      String   @db.Char(64)
+  httpStatus  Int?
+  contentType String?
+  coletadoEm  DateTime @default(now())
+}
+
+model ExecucaoColeta {
+  id              Int            @id @default(autoincrement())
+  chave           String         @unique @db.VarChar(255)
+  conector        String
+  consulta        String         @db.Text
+  janelaInicio    DateTime?      @db.Date
+  janelaFim       DateTime?      @db.Date
+  estado          EstadoExecucao @default(PENDENTE)
+  itensRetornados Int?
+  erro            String?        @db.Text
+  criadoEm        DateTime       @default(now())
+  atualizadoEm    DateTime       @updatedAt
+  candidatos      Candidato[]
+
+  @@index([estado])
+}
+
+model Candidato {
+  id                 Int             @id @default(autoincrement())
+  chave              String          @unique @db.Char(64)
+  urlDescoberta      String          @db.Text
+  urlCanonica        String?         @unique @db.VarChar(700)
+  titulo             String?         @db.VarChar(500)
+  fonteDescoberta    String?
+  publicadoEm        DateTime?
+  execucaoId         Int?
+  execucao           ExecucaoColeta? @relation(fields: [execucaoId], references: [id])
+  estado             EstadoCandidato @default(DESCOBERTO)
+  motivo             String?         @db.Text
+  tentativas         Int             @default(0)
+  ordemFila          BigInt
+  textoTratado       String?         @db.MediumText
+  hashTexto          String?         @db.Char(64)
+  tituloPagina       String?         @db.VarChar(500)
+  dataPublicacao     DateTime?       @db.Date
+  artefatoId         Int?
+  criadoEm           DateTime        @default(now())
+  atualizadoEm       DateTime        @updatedAt
+  extracoes          ExtracaoLlm[]
+  noticia            Noticia?
+
+  @@index([estado, ordemFila])
+}
+
+model ExtracaoLlm {
+  id           Int       @id @default(autoincrement())
+  candidatoId  Int
+  candidato    Candidato @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
+  modelo       String
+  versaoPrompt String
+  respostaBruta Json?
+  sucesso      Boolean
+  erro         String?   @db.Text
+  criadoEm     DateTime  @default(now())
+
+  @@index([criadoEm])
+  @@index([candidatoId])
+}
+
+model RecursoDefesaCivil {
+  id                Int                      @id @default(autoincrement())
+  ckanId            String                   @unique
+  conjunto          String
+  ano               Int
+  licenca           String
+  ultimaModificacao DateTime
+  totalDeclarado    Int?
+  totalImportado    Int                      @default(0)
+  concluido         Boolean                  @default(false)
+  atendimentos      AtendimentoDefesaCivil[]
+}
+
+model AtendimentoDefesaCivil {
+  id             Int                @id @default(autoincrement())
+  recursoId      Int
+  recurso        RecursoDefesaCivil @relation(fields: [recursoId], references: [id])
+  idOrigem       Int
+  regional       String?
+  ano            Int?
+  dataSolicitacao DateTime?         @db.Date
+  ocorrencia     String?            @db.VarChar(255)
+  solicitacao    String?            @db.VarChar(255)
+  categoria      String?
+  tipoEventoId   Int?
+  tipoEvento     TipoEvento?        @relation(fields: [tipoEventoId], references: [id])
+  colunasDeslocadas Boolean         @default(false)
+  hashLinha      String             @db.Char(64)
+  bairroOriginal String?
+  bairroId       Int?
+  bairro         Bairro?            @relation(fields: [bairroId], references: [id])
+  grauRisco      String?
+  dataAcao       DateTime?          @db.Date
+  tipoAcao       String?            @db.VarChar(255)
+  quantidade     Float?
+  altura         Float?
+  largura        Float?
+  areaM2         Float?
+  alertas        Json?
+
+  @@unique([recursoId, idOrigem])
+  @@index([dataSolicitacao, bairroId])
+  @@index([categoria])
+  @@index([tipoEventoId, dataSolicitacao])
+  @@index([hashLinha])
+  @@index([bairroId])
 }

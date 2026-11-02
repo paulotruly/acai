@@ -1,32 +1,16 @@
-# React + TypeScript + Vite
+# Interface pública
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Site em React, Vite e TanStack Router que apresenta os dados do projeto. Os requisitos estão em [`specs/07-api-e-interface.md`](../specs/07-api-e-interface.md).
 
-Currently, two official plugins are available:
+## Execução local
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Com a API em execução na porta 3001:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+O site fica disponível em `http://localhost:5173`.
+
+Para apontar para outra API, copie `.env.example` para `.env` e altere `VITE_URL_API`. A compilação para publicação usa `npm run build`.

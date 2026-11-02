@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
 import routes from './routes/index.js'
 
@@ -12,5 +12,10 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/api', routes)
+
+app.use((erro: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(erro)
+  res.status(500).json({ success: false, message: 'Erro interno do servidor' })
+})
 
 export default app

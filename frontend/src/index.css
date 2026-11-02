@@ -74,6 +74,8 @@
     --chart-5: oklch(0.269 0 0);
     --radius: 0.625rem;
     --serie-1: #2a78d6;
+    --marca: #2a78d6;
+    --fundo-marca: #f0f6fd;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -86,6 +88,8 @@
 
 .dark {
     --serie-1: #3987e5;
+    --marca: #3987e5;
+    --fundo-marca: #16202c;
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
