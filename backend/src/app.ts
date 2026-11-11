@@ -1,10 +1,11 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
 import routes from './routes/index.js'
+import { env } from './config/env.js'
 
 const app = express()
 
-app.use(cors())
+app.use(cors(env.ORIGENS_PERMITIDAS.length > 0 ? { origin: env.ORIGENS_PERMITIDAS } : undefined))
 app.use(express.json())
 
 app.get('/health', (_req, res) => {

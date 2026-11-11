@@ -48,3 +48,31 @@ As etapas estão descritas em [`specs/04-pipeline.md`](../specs/04-pipeline.md).
 | `GET /api/tipos-evento` | Tipos de evento |
 | `GET /api/municipios` | Municípios do recorte |
 | `GET /api/indicadores` | Agregações de notícias e de atendimentos |
+
+## Implantação no Render
+
+O arquivo `render.yaml`, na raiz do repositório, descreve o serviço da API. No Render, escolha **New › Blueprint** e selecione o repositório. O serviço compila com `npm run build:producao`, aplica as migrações pendentes a cada inicialização (`npm run start:producao`) e usa `/health` como verificação de saúde. A porta é lida da variável `PORT`, que o próprio Render define.
+
+Variáveis a preencher no painel:
+
+| Variável | Valor |
+|---|---|
+| `URL_BANCO_DE_DADOS` | URL do MySQL hospedado, no formato `mysql://usuario:senha@host:porta/banco` |
+| `ORIGENS_PERMITIDAS` | Domínio do site no Vercel, como `https://ecoa.vercel.app` (vários separados por vírgula) |
+| `CHAVE_API_GEMINI` | Opcional; só é usada pela coleta, que roda localmente |
+
+### Banco de dados
+
+O Render não oferece MySQL gerenciado, então o banco precisa ficar em outro provedor com acesso externo, como o Aiven (plano gratuito) ou o Railway. Se o provedor exigir conexão criptografada, acrescente `?ssl=true` ao final da URL.
+
+As migrações criam as tabelas, mas não os dados. Para levar a base local para o banco hospedado:
+
+```bash
+mysqldump -u usuario -p --no-create-info --skip-triggers \
+  --ignore-table=pesquisa_cientifica._prisma_migrations pesquisa_cientifica > dados/base.sql
+mysql -h host -P porta -u usuario -p banco < dados/base.sql
+```
+
+A coleta e a importação continuam rodando localmente; para gravar direto no banco hospedado, aponte `URL_BANCO_DE_DADOS` do `.env` local para ele.
+
+No plano gratuito, o serviço hiberna após um período sem acesso e leva cerca de um minuto para responder à primeira requisição.

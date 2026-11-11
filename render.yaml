@@ -1,0 +1,26 @@
+# Blueprint do Render para a API do ECOA.
+# O banco MySQL fica fora do Render (veja backend/README.md, seção "Implantação").
+services:
+  - type: web
+    name: ecoa-api
+    runtime: node
+    plan: free
+    region: virginia
+    rootDir: backend
+    buildCommand: npm ci --include=dev && npm run build:producao
+    startCommand: npm run start:producao
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: URL_BANCO_DE_DADOS
+        sync: false
+      - key: ORIGENS_PERMITIDAS
+        sync: false
+      - key: CHAVE_API_GEMINI
+        sync: false
+      - key: MODELO_GEMINI
+        value: gemini-2.5-flash
