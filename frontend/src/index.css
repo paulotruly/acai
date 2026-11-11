@@ -1,13 +1,22 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/montserrat";
+@import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
+    --font-heading: 'Montserrat Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    --color-ecoa-marinho: var(--ecoa-marinho);
+    --color-ecoa-petroleo: var(--ecoa-petroleo);
+    --color-ecoa-agua: var(--ecoa-agua);
+    --color-ecoa-coral: var(--ecoa-coral);
+    --color-ecoa-coral-escuro: var(--ecoa-coral-escuro);
+    --color-ecoa-areia: var(--ecoa-areia);
+    --color-ecoa-creme: var(--ecoa-creme);
+    --color-ecoa-creme-escuro: var(--ecoa-creme-escuro);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,74 +58,84 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --serie-1: #2a78d6;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    /* Identidade visual do ECOA */
+    --ecoa-marinho: #0b4f5c;
+    --ecoa-petroleo: #147c7e;
+    --ecoa-agua: #4fb3b3;
+    --ecoa-coral: #e76f51;
+    --ecoa-coral-escuro: #c4502f;
+    --ecoa-areia: #f4a261;
+    --ecoa-creme: #f8f1e7;
+    --ecoa-creme-escuro: #f1e6d6;
+
+    --background: var(--ecoa-creme);
+    --foreground: var(--ecoa-marinho);
+    --card: #fffbf5;
+    --card-foreground: var(--ecoa-marinho);
+    --popover: #fffbf5;
+    --popover-foreground: var(--ecoa-marinho);
+    --primary: var(--ecoa-marinho);
+    --primary-foreground: #ffffff;
+    --secondary: var(--ecoa-creme-escuro);
+    --secondary-foreground: var(--ecoa-marinho);
+    --muted: var(--ecoa-creme-escuro);
+    --muted-foreground: #4f6b70;
+    --accent: #fdebe3;
+    --accent-foreground: var(--ecoa-marinho);
+    --destructive: #b42318;
+    --border: #ead9c3;
+    --input: #e2cdb2;
+    --ring: var(--ecoa-petroleo);
+    --chart-1: var(--ecoa-petroleo);
+    --chart-2: var(--ecoa-coral);
+    --chart-3: var(--ecoa-agua);
+    --chart-4: var(--ecoa-areia);
+    --chart-5: var(--ecoa-marinho);
+    --radius: 0.875rem;
+    --serie-1: var(--ecoa-petroleo);
+    --marca: var(--ecoa-marinho);
+    --fundo-marca: var(--ecoa-creme);
+    --sidebar: #fffbf5;
+    --sidebar-foreground: var(--ecoa-marinho);
+    --sidebar-primary: var(--ecoa-marinho);
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: var(--ecoa-creme-escuro);
+    --sidebar-accent-foreground: var(--ecoa-marinho);
+    --sidebar-border: #ead9c3;
+    --sidebar-ring: var(--ecoa-petroleo);
 }
 
+/* O site usa apenas o tema claro; o escuro só mantém a coerência com a marca. */
 .dark {
-    --serie-1: #3987e5;
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: #072f37;
+    --foreground: var(--ecoa-creme);
+    --card: #0b3f49;
+    --card-foreground: var(--ecoa-creme);
+    --popover: #0b3f49;
+    --popover-foreground: var(--ecoa-creme);
+    --primary: var(--ecoa-agua);
+    --primary-foreground: #072f37;
+    --secondary: #0f4a55;
+    --secondary-foreground: var(--ecoa-creme);
+    --muted: #0f4a55;
+    --muted-foreground: #a9c4c6;
+    --accent: #0f4a55;
+    --accent-foreground: var(--ecoa-areia);
+    --destructive: #f97066;
+    --border: rgb(255 255 255 / 12%);
+    --input: rgb(255 255 255 / 18%);
+    --ring: var(--ecoa-agua);
+    --serie-1: var(--ecoa-agua);
+    --marca: var(--ecoa-agua);
+    --fundo-marca: #072f37;
+    --sidebar: #0b3f49;
+    --sidebar-foreground: var(--ecoa-creme);
+    --sidebar-primary: var(--ecoa-agua);
+    --sidebar-primary-foreground: #072f37;
+    --sidebar-accent: #0f4a55;
+    --sidebar-accent-foreground: var(--ecoa-creme);
+    --sidebar-border: rgb(255 255 255 / 12%);
+    --sidebar-ring: var(--ecoa-agua);
 }
 
 @layer base {
@@ -127,6 +146,13 @@
     @apply bg-background text-foreground;
     }
   html {
-    @apply font-sans;
+    @apply font-sans antialiased;
+    scroll-behavior: smooth;
+    }
+  h1, h2, h3 {
+    @apply font-heading text-ecoa-marinho;
+    }
+  ::selection {
+    @apply bg-ecoa-agua/30;
     }
 }

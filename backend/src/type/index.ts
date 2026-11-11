@@ -4,81 +4,80 @@ export interface ApiResponse<T = unknown> {
   data?: T
 }
 
-export interface Usuario {
-  id: number
-  email: string
-  nome: string | null
-  senha: string
-  criadoEm: Date
-  atualizadoEm: Date
-}
-
-export interface CriarUsuarioInput {
-  email: string
-  nome?: string
-  senha: string
-}
-
-export type Sentimento = 'POSITIVO' | 'NEGATIVO' | 'NEUTRO' | 'MISTO'
-
 export interface TipoEvento {
   id: number
   nome: string
-  criadoEm: Date
-  atualizadoEm: Date
 }
 
-export interface Noticia {
+export interface Municipio {
+  id: number
+  nome: string
+}
+
+export interface NoticiaPublica {
   id: number
   titulo: string | null
-  data: Date | null
+  dataPublicacao: string | null
+  dataEvento: string | null
   fonte: string
   url: string
-  textoCompleto: string
-  tipoEventoId: number | null
-  localizacaoTexto: string | null
-  bairro: string | null
-  ruaOuPontoDeReferencia: string | null
+  tipoEvento: string | null
+  municipios: string[]
+  bairros: string[]
   pessoasAfetadas: string | null
   danoMaterial: string | null
   problemaInfraestrutura: string | null
-  depoimentoMorador: string | null
   depoimentoInstituicao: string | null
-  sentimento: Sentimento | null
-  temas: unknown
-  latitude: number | null
-  longitude: number | null
-  criadoEm: Date
-  atualizadoEm: Date
+  temas: string[]
 }
 
-export interface CriarNoticiaInput {
-  titulo?: string
-  data?: Date
-  fonte: string
-  url: string
-  textoCompleto: string
+export interface PaginaNoticias {
+  itens: NoticiaPublica[]
+  total: number
+  pagina: number
+  porPagina: number
+}
+
+export interface FiltrosNoticias {
+  pagina: number
+  porPagina: number
+  busca?: string
   tipoEventoId?: number
-  localizacaoTexto?: string
-  bairro?: string
-  ruaOuPontoDeReferencia?: string
-  pessoasAfetadas?: string
-  danoMaterial?: string
-  problemaInfraestrutura?: string
-  depoimentoMorador?: string
-  depoimentoInstituicao?: string
-  sentimento?: Sentimento
-  temas?: string[]
-  latitude?: number
-  longitude?: number
+  municipioId?: number
+  de?: Date
+  ate?: Date
 }
 
-export interface PesquisarNoticiasInput {
-  consulta: string
-  quantidade?: number
+export interface ItemContagem {
+  rotulo: string
+  valor: number
 }
 
-export interface PesquisarNoticiasResultado {
-  criadas: Noticia[]
-  ignoradas: number
+export interface Periodo {
+  inicio: string | null
+  fim: string | null
+}
+
+export interface Indicadores {
+  noticias: {
+    total: number
+    fontes: number
+    municipios: number
+    periodo: Periodo
+    porTipo: ItemContagem[]
+    porAno: ItemContagem[]
+    porMunicipio: ItemContagem[]
+    porBairro: ItemContagem[]
+  }
+  defesaCivil: {
+    total: number
+    linhasDistintas: number
+    bairros: number
+    licenca: string | null
+    periodo: Periodo
+    porAno: ItemContagem[]
+    porCategoria: ItemContagem[]
+    porBairro: ItemContagem[]
+    ocorrenciasPorBairro: ItemContagem[]
+  }
 }

@@ -2,22 +2,16 @@ import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import { PrismaClient } from '../src/generated/prisma/client.js'
 import 'dotenv/config'
 
-const adapter = new PrismaMariaDb(process.env.URL_BANCO_DE_DADOS!)
+const url = new URL(process.env.URL_BANCO_DE_DADOS!)
+if (!url.searchParams.has('allowPublicKeyRetrieval')) {
+  url.searchParams.set('allowPublicKeyRetrieval', 'true')
+}
+const adapter = new PrismaMariaDb(url.toString())
 const prisma = new PrismaClient({ adapter })
 
 const TIPOS_EVENTO = ['enchente', 'alagamento', 'deslizamento', 'falta_de_agua', 'incendio', 'outro']
 
 async function main() {
-  await prisma.usuario.upsert({
-    where: { email: 'admin@exemplo.com' },
-    update: {},
-    create: {
-      email: 'admin@exemplo.com',
-      nome: 'Admin',
-      senha: 'senha-segura',
-    },
-  })
-
   for (const nome of TIPOS_EVENTO) {
     await prisma.tipoEvento.upsert({
       where: { nome },
